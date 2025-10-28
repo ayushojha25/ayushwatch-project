@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<title>Ayush Watches </title>
+  <style>
+    body { background: #121212; color: #fff; font-family: Arial, sans-serif; }
+    header {  background: linear-gradient(90deg, #1e1e1e 55%, #ff8c00 100%); border-bottom: 3px solid orange;text-align: center; padding-top: 20px;}
+    header h1 { color: orange; }
+    nav a { color: #fff; text-decoration: none; margin: 0 10px; }
+    .login-btn-main { float:right; margin: 15px 32px 0 0; background: orange; color: #121212; padding: 9px 22px; border-radius: 17px; border:none; cursor:pointer;}
+    .filter-buttons { text-align:center; margin: 30px 0;}
+    .filter-btn { background: orange; color: #121212; border-radius: 15px; border:none; padding: 8px 22px; margin:4px; cursor: pointer;}
+    .product-list { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center;}
+    .product { background: #232323; border-radius: 12px;box-shadow: 0 8px 32px rgba(255,140,0,0.14);transition: transform 0.2s, box-shadow 0.2s;}
+    .product:hover {transform: scale(1.08) translateY(-7px);box-shadow: 0 16px 40px rgba(255,140,0,0.24); z-index: 2;} 
+    .product img { width:140px; hieght: 140px; object-fit: cover;border-radius: 0 2px 14px; box-shadow : 0 2px 14px rgba(255,140,0,0.19); transition: transform 0.3s;}.product:hover img{ transform : scale(1.15);}
+    .product-name { color: orange; font-size: 1.08em; font-weight: bold; margin: 8px 0 2px;}
+    .product-category { color: #bbbbbb;}
+    .product-price { background: orange; color: #121212; padding: 3px 10px; border-radius: 15px; margin-top:7px; display:inline-block;}
+    .product button { background: orange; color: #121212; border: none; border-radius: 17px; padding: 8px 22px; margin-top: 10px; cursor:pointer;}
+@media (max-width: 650px) {
+  .product-list { flex-direction: column; align-items: center; }
+  .filter-buttons { flex-direction: column; }
+}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Watchcart</h1>
+  <nav>
+    <a href="home.html">Home</a>
+    <a href="#">Shop</a>
+  </nav>
+</header>
+
+<div class="filter-buttons" id="filterBtns"></div>
+<div class="product-list" id="productList"></div>
+<div class="modal-bg" id="loginModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(20,20,20,0.93); justify-content:center; align-items:center; z-index:10;">
+  <div style="background:#242424; border-radius:12px; padding:35px 28px; box-shadow:0 8px 30px rgba(0,0,0,0.52); border:2px solid orange; min-width:260px; text-align:center;">
+    <h2 style="color:orange; margin-bottom:15px;">Login</h2>
+    <form onsubmit="return validateLogin()">
+      <input type="text" id="username" placeholder="Username" style="padding:9px 12px; margin:8px 0; width:95%; border-radius:6px; border:none;"><br>
+      <input type="password" id="password" placeholder="Password" style="padding:9px 12px; margin:8px 0; width:95%; border-radius:6px; border:none;"><br>
+      <button type="submit" style="padding:9px 22px; border-radius:16px; border:none; background:orange; color:#121212; font-weight:700;">Login</button>
+    </form>
+    <div id="loginError" style="margin:8px 0 0 0; color:#ff4343;"></div>
+    <button onclick="closeLoginModal()" style="margin-top:13px; color:orange; background:none; border:none; font-weight:700; cursor:pointer;">Close</button>
+  </div>
+</div>
+
+<script>
+const watches = [
+  { name: "Classic Black", category: "Luxury", price: "₹15,999", img: "urbanglow.jpg" },
+  { name: "Matte Orange Dive", category: "Sports", price: "₹8,299", img: "matteorangedive.jpg" },
+  { name: "Minimal Daytime", category: "Casual", price: "₹4,499", img: "minimaldaytime.jpg" },
+  { name: "Analog watch for women", category: "Luxury", price: "₹20,499", img: "analogwatchforwomen.jpg" },
+  { name: "Silver uniquedial", category: "Luxury", price: "₹14,499", img: "silveruniqedial.jpg" },
+  { name: "Frenchconnection", category: "Luxury", price: "₹34,499", img: "frenchcoonection.jpg" },
+  { name: "Silver Stainless", category: "Casual", price: "₹2,499", img: "silverdialstainless.jpg" },
+  { name: "Casual Dial Leather Watch", category: "Casual", price: "₹3,499", img: "casualdialleather.jpg"},
+  { name: "Analog Watch(for men)", category: "Casual", price: "₹2,499", img: "analogwatchformen.jpg" },
+  { name: "Black Sports", category: "Sports", price: "₹1499", img: "blackssports.jpg" },
+  { name: "Kids Digital Watch", category: "Sports", price: "₹499", img:  "kidsdigitalwatch.jpg"},
+  { name: "Black Sports (For Men)", category: "Sports", price: "₹999", img: "blacksportsformen.jpg" },
+ ];
+const categories = ["All", ...Array.from(new Set(watches.map(w => w.category)))];
+function renderCategoryBtns() {
+  const filterBtns = document.getElementById('filterBtns');
+  filterBtns.innerHTML = '';
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.textContent = cat;
+    btn.className = 'filter-btn';
+    btn.onclick = () => filterProducts(cat);
+    filterBtns.appendChild(btn);
+  });
+}
+function renderProducts(list) {
+  const productList = document.getElementById('productList');
+  productList.innerHTML = '';
+  list.forEach(watch => {
+    const prod = document.createElement('div');
+    prod.className = 'product';
+    prod.innerHTML = `<img src="${watch.img}" alt="${watch.name}">
+        <div class="product-name">${watch.name}</div>
+        <div class="product-category">${watch.category}</div>
+        <div class="product-price">${watch.price}</div>
+        <button onclick="alert('Buying ${watch.name}')">Buy Now</button>`;
+    productList.appendChild(prod);
+  });
+}
+function filterProducts(category) {
+  if (category === 'All') renderProducts(watches);
+  else renderProducts(watches.filter(w => w.category === category));
+}
+renderCategoryBtns();
+renderProducts(watches);
+</script>
+<script>
+// Show login modal
+function openLoginModal() {
+  document.getElementById('loginModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+// Close modal
+function closeLoginModal() {
+  document.getElementById('loginModal').style.display = 'none';
+  document.body.style.overflow = '';
+  document.getElementById('loginError').innerText = "";
+  document.getElementById('username').value = "";
+  document.getElementById('password').value = "";
+}
+
+</script>
+<footer style="text-align:center; color:#ffa733; background:#232323; padding:16px 0; margin-top:35px;">
+  &copy; 2025 Developed by Ayush Ojha | Made in India
+</footer>
+</body>
+</html>
