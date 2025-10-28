@@ -1,0 +1,2 @@
+# ayushwatch-project
+Watchcart: Modern Watch Store ProjectThis project is a web-based watch store featuring a modern shopping page and user login screen.Technologies: HTML, CSS, JavaScriptPages:Shop page with category filter, product cards, responsive design, and animated backgroundSecure login page with animated gradient background and neat form designFeatures:Attractive animated gradient backgroundsProduct filteringProfessional UI with minimal, matte-orange themeEasy navigation between shop and login (home)
